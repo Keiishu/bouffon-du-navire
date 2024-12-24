@@ -1,0 +1,14 @@
+{
+  "$schema": "./stimuli.schema.json",
+  "stimuli": [
+    {
+      "message": "feur",
+      "keyword": true,
+      "reactions": [
+        "ta gueule",
+        "La petitesse de ton QI est égale à la bassesse de ton esprit.",
+        "Ton QI inférieur à la température ambiante là"
+      ]
+    }
+  ]
+}
