@@ -1,7 +1,10 @@
 services:
-  db:
-    image: postgres:17-alpine
+  bot:
+    build: .
+    volumes:
+      - ./prisma/dev.db:/app/data/db/dev.db
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      PORT: "3000"
+      LOG_LEVEL: "DEBUG"
+      DISCORD_TOKEN: "MTMyMDg3NjcyODEyNTYyMDMxOA.GsSMqg.xVctk-fxE1IGsKfu96ZivPGPNPowsd5f55zhAw"
+      DISCORD_DEVELOPMENT_GUILD_ID: "137229336037163008"
