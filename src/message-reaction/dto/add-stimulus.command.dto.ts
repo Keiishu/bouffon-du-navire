@@ -21,4 +21,11 @@ export class AddStimulusCommandDto {
     required: false,
   })
   public keyword: boolean;
+
+  @BooleanOption({
+    name: "stickers",
+    description: "Whether the stimulus should be triggered by stickers",
+    required: false,
+  })
+  public stickers: boolean;
 }

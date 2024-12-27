@@ -17,6 +17,7 @@ model MessageReaction_Stimulus {
   updatedAt DateTime                   @updatedAt
   message   String                     @unique
   keyword   Boolean                    @default(true)
+  stickers  Boolean                    @default(true)
   reactions MessageReaction_Response[]
 }
 

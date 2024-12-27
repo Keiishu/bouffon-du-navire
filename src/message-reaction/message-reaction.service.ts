@@ -39,9 +39,17 @@ export class MessageReactionService {
     // If the stimuli is marked as not a keyword, check if the message only contains the stimulus
     const stimulus = this.stimuli.find(stimulus => {
       const content = message.content.toLowerCase();
+      const stickers = message.stickers;
       if (stimulus.keyword) {
+        // If the message contains stickers, and the stimulus allows stickers triggers, check if the sticker name contains the stimulus message
+        if (stimulus.stickers && stickers) {
+          return stickers.some(sticker => sticker.name.includes(stimulus.message));
+        }
         return content.split(/[\s\\.!?]/).includes(stimulus.message);
       } else {
+        if (stimulus.stickers && stickers) {
+          return stickers.some(sticker => sticker.name == stimulus.message);
+        }
         return content === stimulus.message;
       }
     });
@@ -68,6 +76,7 @@ export class MessageReactionService {
         data: {
           message: options.message,
           keyword: options.keyword ?? undefined,  // We have to use undefined if null so that the default value is used
+          stickers: options.stickers ?? undefined,
           reactions: {
             create: options.reactions.split("|").map(reaction => ({message: reaction})),
           },
@@ -96,7 +105,7 @@ export class MessageReactionService {
   public async listStimuli(@Context() [interaction]: SlashCommandContext) {
     try {
       const stimuliField: APIEmbedField[] = this.stimuli.map((stimulus, index) => ({
-        name: `${stimulus.message} ${stimulus.keyword ? "(🔤)" : ""}`,
+        name: `${stimulus.message} ${stimulus.keyword ? "(🔤)" : ""} ${stimulus.stickers ? "(🪧)" : ""}`,
         value: stimulus.reactions.map(reaction => reaction.message).join("\n"),
         inline: index % 3 !== 2,
       }));
@@ -198,7 +207,6 @@ export class MessageReactionService {
       const updatedStimulus = await this.dbService.messageReaction_Stimulus.update({
         where: {message: stimulus.message},
         data: {keyword: !stimulus.keyword},
-        include: {reactions: true},
       });
       this.logger.debug(`Toggled stimulus as ${keywordStr}: ${updatedStimulus.message}`);
 
