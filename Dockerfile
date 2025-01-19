@@ -14,15 +14,11 @@ RUN pnpm add @nestjs/cli prisma
 FROM base AS prisma
 
 WORKDIR /app
-VOLUME /app/data
-
-ENV DATABASE_URL="file:../data/db/dev.db"
 
 COPY --from=base /app /app
 COPY . .
 
 RUN pnpm run db:generate
-RUN pnpm run db:deploy
 
 FROM prisma AS build
 
@@ -31,7 +27,6 @@ WORKDIR /app
 COPY --from=prisma /app /app
 
 RUN pnpm run build
-RUN pnpm prune --prod
 
 EXPOSE 8080
 
