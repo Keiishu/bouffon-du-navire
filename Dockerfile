@@ -34,4 +34,5 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV LOG_LEVEL=log
 
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "node", "dist/src/main" ]
