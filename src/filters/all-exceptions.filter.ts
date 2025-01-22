@@ -11,6 +11,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   async catch(exception: unknown, host: NecordExecutionContext) {
+    this.logger.error(exception);
+
     const channelId: string | undefined = host.getArgs().at(0).at(0)?.channelId;
     const channel = this.client.channels.cache.get(channelId);
 
@@ -21,10 +23,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       {name: "Channel", value: `${channel.isTextBased ? (channel as TextChannel).name : undefined} (${channel.id})`},
     ]);
 
-    // Martin
     await (this.client.channels.cache.get(this.config.get("BUGS_CHANNEL_ID")) as TextChannel).send({embeds: [embed]});
 
-    this.logger.error(exception);
     console.dir(host, {depth: null});
   }
 }
