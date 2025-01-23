@@ -1,6 +1,6 @@
 node_modules
 dist
-.git
+.git/
 .github
 .vscode
 .idea
@@ -9,3 +9,6 @@ dist
 .env.*
 *.md
 *.log
+Dockerfile
+**/*.md
+**/*.log
