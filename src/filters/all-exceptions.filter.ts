@@ -1,8 +1,10 @@
 import { Catch, ExceptionFilter, Logger } from "@nestjs/common";
-import { Client, EmbedBuilder, TextChannel } from "discord.js";
+import { Channel, Client, EmbedBuilder, TextChannel } from "discord.js";
 import { NecordExecutionContext } from "necord";
 import { ConfigService } from "@nestjs/config";
+import { ExecutionContextHost } from "@nestjs/core/helpers/execution-context-host";
 
+// TODO: Use webhooks to send the error message in case the bot cannot even connect to Discord
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private logger = new Logger(AllExceptionsFilter.name);
@@ -10,21 +12,33 @@ export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly client: Client, private readonly config: ConfigService) {
   }
 
-  async catch(exception: unknown, host: NecordExecutionContext) {
-    const channelId: string | undefined = host.getArgs().at(0).at(0)?.channelId;
-    const channel = this.client.channels.cache.get(channelId);
+  async catch(exception: unknown, host: ExecutionContextHost | NecordExecutionContext) {
+    this.logger.error(exception);
+    //console.dir(host, {depth: null});
 
-    // Send a message to the dev server
+    // Build a message to send to the dev server
     const embed = new EmbedBuilder().setColor("Red").setTitle("Error").setDescription(`An error occurred`);
+
     embed.addFields([
-      {name: "Exception", value: exception.toString()},
-      {name: "Channel", value: `${channel.isTextBased ? (channel as TextChannel).name : undefined} (${channel.id})`},
+      {
+        name: "Exception",
+        value: exception.toString(),
+      },
     ]);
 
-    // Martin
-    await (this.client.channels.cache.get(this.config.get("BUGS_CHANNEL_ID")) as TextChannel).send({embeds: [embed]});
+    if (host instanceof NecordExecutionContext) {
+      const channelId: string | undefined = host.getArgs().at(0).at(0)?.channelId;
+      const channel: Channel | undefined = this.client.channels.cache.get(channelId);
 
-    this.logger.error(exception);
-    console.dir(host, {depth: null});
+      embed.addFields([
+        {
+          name: "Channel",
+          value: `${channel?.isTextBased ? (channel as TextChannel).name : undefined} (${channel?.id})`,
+        },
+      ]);
+    }
+
+    // Send the message to the dev server
+    await (this.client.channels.cache.get(this.config.get("BUGS_CHANNEL_ID")) as TextChannel).send({embeds: [embed]});
   }
 }

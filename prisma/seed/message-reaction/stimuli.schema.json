@@ -8,7 +8,12 @@
         "type": "string"
       },
       "keyword": {
-        "type": "boolean"
+        "type": "boolean",
+        "default": true
+      },
+      "stickers": {
+        "type": "boolean",
+        "default": true
       },
       "reactions": {
         "type": "array",

@@ -4,10 +4,13 @@
     {
       "message": "feur",
       "keyword": true,
+      "stickers": true,
       "reactions": [
-        "ta gueule",
         "La petitesse de ton QI est égale à la bassesse de ton esprit.",
-        "Ton QI inférieur à la température ambiante là"
+        "Ton QI inférieur à la température ambiante là",
+        "Plus jamais tu dis ça par contre",
+        "Je propose que tu te taises à jamais %DISPLAY_NAME%",
+        "Tu te crois drôle %DISPLAY_NAME% ?"
       ]
     }
   ]
