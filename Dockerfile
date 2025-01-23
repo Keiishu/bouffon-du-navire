@@ -25,7 +25,7 @@ WORKDIR /app
 
 RUN pnpm run build
 
-FROM base AS release
+FROM prisma AS runtime
 
 WORKDIR /app
 
