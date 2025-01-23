@@ -7,15 +7,14 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable
-RUN pnpm install --prod --frozen-lockfile
-RUN pnpm add @nestjs/cli prisma
+RUN corepack enable && \
+    pnpm install --prod --frozen-lockfile && \
+    pnpm add @nestjs/cli prisma
 
 FROM base AS prisma
 
 WORKDIR /app
 
-COPY --from=base /app /app
 COPY . .
 
 RUN pnpm run db:generate
@@ -24,9 +23,14 @@ FROM prisma AS build
 
 WORKDIR /app
 
-COPY --from=prisma /app /app
-
 RUN pnpm run build
+
+FROM base AS release
+
+WORKDIR /app
+
+COPY --from=build /app/dist ./dist
+COPY --from=prisma /app/prisma ./prisma
 
 EXPOSE 8080
 
