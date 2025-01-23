@@ -34,5 +34,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV LOG_LEVEL=log
 
+COPY --chmod=0755 docker-entrypoint.sh .
+
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
 CMD [ "node", "dist/src/main" ]
