@@ -29,6 +29,7 @@ FROM base AS release
 
 WORKDIR /app
 
+COPY --from=build /app/tsconfig*.json .
 COPY --from=build /app/dist ./dist
 COPY --from=prisma /app/prisma ./prisma
 
