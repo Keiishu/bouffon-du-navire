@@ -1,14 +1,12 @@
 services:
   bot:
     build: .
-    entrypoint: [ "/docker-entrypoint.sh" ]
-    command: [ "node", "dist/src/main" ]
     depends_on:
       db:
         condition: service_healthy
         required: true
     volumes:
-      - ./docker-entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./docker-entrypoint.sh:/app/docker-entrypoint.sh:ro
     environment:
       PORT: "3000"
       LOG_LEVEL: "verbose"
