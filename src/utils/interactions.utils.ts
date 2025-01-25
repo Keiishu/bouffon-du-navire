@@ -5,7 +5,7 @@ const logger = new Logger("InteractionsUtils");
 
 export async function throwError(message: string, interaction: ChatInputCommandInteraction) {
   const embed = new EmbedBuilder().setColor("Red").setDescription(message);
-  await interaction.reply({embeds: [embed], ephemeral: true}).catch(() => {
+  await interaction.reply({embeds: [embed], flags: "Ephemeral"}).catch(() => {
     logger.error("Failed to send error message");
   });
 }
