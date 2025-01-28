@@ -29,3 +29,21 @@ model MessageReaction_Response {
   stimulus   MessageReaction_Stimulus @relation(fields: [stimulusId], references: [id], onDelete: Cascade)
   stimulusId String
 }
+
+// Tree Stats
+model TreeStats_Trees {
+  id        String            @id @default(cuid())
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  name      String            @unique
+  stats     TreeStats_Stats[]
+}
+
+model TreeStats_Stats {
+  id     String          @id @default(cuid())
+  date   DateTime        @default(now())
+  tree   TreeStats_Trees @relation(fields: [treeId], references: [id])
+  treeId String
+  rank   Int
+  height Float
+}

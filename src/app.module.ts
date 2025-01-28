@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as joi from "joi";
 import { IntentsBitField } from "discord.js";
 import { MessageReactionModule } from "./message-reaction/message-reaction.module";
+import { TreeStatsModule } from "./tree-stats/tree-stats.module";
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { MessageReactionModule } from "./message-reaction/message-reaction.modul
         development: configService.get("DISCORD_DEVELOPMENT_GUILD_ID") ?? undefined,
       }),
     }),
-    MessageReactionModule],
+    MessageReactionModule,
+    TreeStatsModule],
   providers: [AppService],
 })
 export class AppModule {

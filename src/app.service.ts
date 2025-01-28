@@ -7,9 +7,9 @@ export class AppService {
   private readonly logger = new Logger(AppService.name);
 
   @Once("ready")
-  public onReady(@Context() [client]: ContextOf<"ready">) {
+  public async onReady(@Context() [client]: ContextOf<"ready">) {
     this.logger.log(`Bot logged in as ${client.user.username}`);
-    client.user.setActivity("les Fragilités Loliennes", {type: ActivityType.Listening})
+    client.user.setActivity("les Fragilités Loliennes", {type: ActivityType.Listening});
   }
 
   @On("warn")
