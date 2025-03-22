@@ -7,6 +7,7 @@ import * as joi from "joi";
 import { IntentsBitField } from "discord.js";
 import { MessageReactionModule } from "./message-reaction/message-reaction.module";
 import { VendingMachineModule } from './vending-machine/vending-machine.module';
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { VendingMachineModule } from './vending-machine/vending-machine.module';
         PEXELS_API_KEY: joi.string().required(),
       }),
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     NecordModule.forRootAsync({
       inject: [ConfigService],
