@@ -6,7 +6,7 @@ import { VendingMachine_Product } from "@prisma/client";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import { type createClient, PhotosWithTotalResults } from "pexels";
 import { throwError } from "src/utils/interactions.utils";
-import { APIEmbedField, EmbedBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { VendingMachineInterceptor } from "./interceptors/vending-machine.interceptor";
 import { AddProductCommandDto } from "./dto/add-product-command.dto";
 import { BuyProductCommandDto } from "./dto/buy-product-command.dto";
@@ -46,6 +46,7 @@ export class VendingMachineService {
       }
 
       if (await this.cacheManager.get(`vending-machine:timeout:${interaction.user.id}`)) {
+        this.logger.verbose(`User ${interaction.user.id} tried to buy on timeout`);
         return throwError("Doucement mon gourmand, attend un peu !", interaction);
       }
 
@@ -73,8 +74,10 @@ export class VendingMachineService {
 
       // Cache the fact that the user has bought a product
       await this.cacheManager.set(`vending-machine:timeout:${interaction.user.id}`, true);
-      this.schedulerRegistry.addTimeout(`vending-machine:timeout:${interaction.user.id}`, setTimeout(() => {
-        this.cacheManager.del(`vending-machine:timeout;${interaction.user.id}`);
+      this.schedulerRegistry.addTimeout(`vending-machine:timeout:${interaction.user.id}`, setTimeout(async () => {
+        this.logger.verbose(`User ${interaction.user.id} can buy again`);
+        await this.cacheManager.del(`vending-machine:timeout:${interaction.user.id}`);
+        this.schedulerRegistry.deleteTimeout(`vending-machine:timeout:${interaction.user.id}`);
       }, 1000 * 10));
 
       /// Get random picture
