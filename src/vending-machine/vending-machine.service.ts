@@ -46,7 +46,7 @@ export class VendingMachineService {
       }
 
       if (await this.cacheManager.get(`vending-machine:timeout:${interaction.user.id}`)) {
-        return throwError("You have already bought a product recently, please wait a bit before buying another one!", interaction);
+        return throwError("Doucement mon gourmand, attend un peu !", interaction);
       }
 
       // Log the purchase
@@ -75,7 +75,7 @@ export class VendingMachineService {
       await this.cacheManager.set(`vending-machine:timeout:${interaction.user.id}`, true);
       this.schedulerRegistry.addTimeout(`vending-machine:timeout:${interaction.user.id}`, setTimeout(() => {
         this.cacheManager.del(`vending-machine:timeout;${interaction.user.id}`);
-      }, 1000 * 60 * 5));
+      }, 1000 * 10));
 
       /// Get random picture
       // Check if the pictures are already cached, if not, fetch them
@@ -84,7 +84,6 @@ export class VendingMachineService {
         if ("error" in photos && photos.error) {
           this.logger.error(photos.error);
           await throwError("An error occurred while fetching the pictures!", interaction);
-          throw new Error("An error occurred while fetching the pictures!");
         }
         photos = photos as PhotosWithTotalResults;
 
