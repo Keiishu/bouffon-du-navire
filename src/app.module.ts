@@ -8,6 +8,7 @@ import { IntentsBitField } from "discord.js";
 import { MessageReactionModule } from "./message-reaction/message-reaction.module";
 import { VendingMachineModule } from './vending-machine/vending-machine.module';
 import { ScheduleModule } from "@nestjs/schedule";
+import { FunCommandsModule } from './fun-commands/fun-commands.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { ScheduleModule } from "@nestjs/schedule";
       }),
     }),
     MessageReactionModule,
-    VendingMachineModule],
+    VendingMachineModule,
+    FunCommandsModule],
   providers: [AppService],
 })
 export class AppModule {
