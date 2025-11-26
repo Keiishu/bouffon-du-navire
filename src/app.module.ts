@@ -15,6 +15,7 @@ import { FunCommandsModule } from './fun-commands/fun-commands.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: joi.object({
+        DATABASE_URL: joi.string().required(),
         DISCORD_TOKEN: joi.string().required(),
         DISCORD_DEVELOPMENT_GUILD_ID: joi.string(),
         BUGS_CHANNEL_ID: joi.string().required(),

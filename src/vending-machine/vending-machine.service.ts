@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger, UseInterceptors } from "@nestjs/common";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Context, createCommandGroupDecorator, On, Options, SlashCommandContext, Subcommand } from "necord";
 import { PrismaService } from "../prisma/prisma.service";
-import { VendingMachine_Product } from "@prisma/client";
+import { VendingMachine_Product } from "../prisma/generated/prisma-client/client";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import { type createClient, PhotosWithTotalResults } from "pexels";
 import { throwError } from "src/utils/interactions.utils";
@@ -17,6 +17,13 @@ export const VendingMachineCommandDecorator = createCommandGroupDecorator({
   description: "Vending Machine Commands",
 });
 
+// TODO: Maybe move this into a global "/admin" subgroup idk
+export const VendingMachineAdminCommandDecorator = createCommandGroupDecorator({
+  name: "vending-machine-admin",
+  description: "Vending Machine Admin Commands",
+  defaultMemberPermissions: ["ManageGuild"],
+});
+
 @Injectable()
 @VendingMachineCommandDecorator()
 export class VendingMachineService {
@@ -26,7 +33,7 @@ export class VendingMachineService {
               private readonly schedulerRegistry: SchedulerRegistry, @Inject("Pexels") private readonly pexels: ReturnType<typeof createClient>) {
   }
 
-  @On("ready")
+  @On("clientReady")
   public async onReady() {
     await this.cacheManager.set("vending-machine:products", await this.prisma.vendingMachine_Product.findMany());
   }
@@ -134,11 +141,7 @@ export class VendingMachineService {
 }
 
 @Injectable()
-@VendingMachineCommandDecorator({
-  name: "admin",
-  description: "Vending Machine Admin Commands",
-  defaultMemberPermissions: ["ManageGuild"],
-})
+@VendingMachineAdminCommandDecorator()
 export class VendingMachineAdminService {
   private readonly logger = new Logger(VendingMachineAdminService.name);
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger, UseInterceptors } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Context, ContextOf, On, Once, Options, SlashCommand, SlashCommandContext } from "necord";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../prisma/generated/prisma-client/client";
 import { AddStimulusCommandDto } from "./dto/add-stimulus.command.dto";
 import { MessageReaction_StimulusWithReactions } from "./types/stimulus.type";
 import { throwError } from "../utils/interactions.utils";
@@ -22,7 +22,7 @@ export class MessageReactionService {
   constructor(private readonly dbService: PrismaService) {
   }
 
-  @Once("ready")
+  @Once("clientReady")
   public async onReady() {
     this.stimuli = await this.dbService.messageReaction_Stimulus.findMany({include: {reactions: true}});
 

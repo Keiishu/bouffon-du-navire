@@ -27,6 +27,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     ]);
 
     if (host instanceof NecordExecutionContext) {
+      //@ts-ignore
       const channelId: string | undefined = host.getArgs().at(0).at(0)?.channelId;
       const channel: Channel | undefined = this.client.channels.cache.get(channelId);
 
