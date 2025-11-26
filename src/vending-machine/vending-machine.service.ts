@@ -42,7 +42,7 @@ export class VendingMachineService {
   @UseInterceptors(VendingMachineInterceptor)
   @Subcommand({
     name: "buy",
-    description: "Buy a product from the vending machine",
+    description: "Acheter un produit dans le distributeur",
   })
   public async buy(@Context() [interaction]: SlashCommandContext, @Options() options: BuyProductCommandDto) {
     try {
@@ -50,11 +50,11 @@ export class VendingMachineService {
       const product = options.product;
 
       if (!products.map((product) => product.name).includes(product)) {
-        return throwError("Product not found!", interaction);
+        return throwError("Produit introuvable !", interaction);
       }
 
       if (await this.cacheManager.get(`vending-machine:timeout:${interaction.user.id}`)) {
-        this.logger.verbose(`User ${interaction.user.id} tried to buy on timeout`);
+        this.logger.debug(`User ${interaction.user.id} tried to buy on timeout`);
         return throwError("Doucement mon gourmand, attend un peu !", interaction);
       }
 
@@ -94,7 +94,7 @@ export class VendingMachineService {
         let photos = await this.pexels.photos.search({query: product, per_page: 80});
         if ("error" in photos && photos.error) {
           this.logger.error(photos.error);
-          await throwError("An error occurred while fetching the pictures!", interaction);
+          await throwError("Une erreur est survenue pendant le téléchargement des photos.", interaction);
         }
         photos = photos as PhotosWithTotalResults;
 
@@ -114,19 +114,19 @@ export class VendingMachineService {
       return interaction.reply({embeds: [embed]});
     } catch (e) {
       this.logger.error(`Failed to buy product: ${e}`);
-      return throwError("An error occurred while buying the product!", interaction);
+      return throwError("Une erreur est survenue lors de l'achat du produit.", interaction);
     }
   }
 
   @Subcommand({
     name: "products",
-    description: "List all products available in the vending machine",
+    description: "Lister tous les produits disponibles dans le distributeur",
   })
   public async listProducts(@Context() [interaction]: SlashCommandContext) {
     try {
       const products = await this.cacheManager.get("vending-machine:products") as VendingMachine_Product[];
       const embed = new EmbedBuilder()
-        .setTitle("Vending Machine Products")
+        .setTitle("Produits disponibles")
         .setColor("Gold")
         .setDescription(products.reduce(
           (acc, product) => acc + `- ${product.name}\n`,
@@ -136,7 +136,7 @@ export class VendingMachineService {
       return interaction.reply({embeds: [embed]});
     } catch (e) {
       this.logger.error(`Failed to fetch products: ${e}`);
-      return throwError("An error occurred while listing the products!", interaction);
+      return throwError("Une erreur est survenue pendant le listing des produits.", interaction);
     }
   }
 }

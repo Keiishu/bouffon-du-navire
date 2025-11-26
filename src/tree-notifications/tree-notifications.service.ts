@@ -15,6 +15,7 @@ import {
 import { PrismaService } from "../prisma/prisma.service";
 import { parseTimeInMinutes } from "../utils/datetime";
 import { DiscordLoggerService } from "../logger/discord-logger.service";
+import { throwError } from "../utils/interactions.utils";
 
 /**
  * Service to handle tree watering notifications.
@@ -22,6 +23,7 @@ import { DiscordLoggerService } from "../logger/discord-logger.service";
  */
 @Injectable()
 export class TreeNotificationsService {
+  // TODO: Move these IDs to config/env variables
   private readonly MESSAGE_ID: Snowflake = "1442870371106820186";
   private readonly CHANNEL_ID: Snowflake = "1442870041426133154";
   private readonly ROLE_ID: Snowflake = "1442870502522753075";
@@ -100,7 +102,7 @@ export class TreeNotificationsService {
 
   @SlashCommand({
     name: "tree-notifications",
-    description: "Configure tree watering notifications",
+    description: "Configurer les notifications d'arrosage de l'arbre",
   })
   private async treeNotificationsCommand(@Context() [interaction]: SlashCommandContext) {
     this.logger.debug(`Opening tree notifications settings modal for user ${interaction.user.id}...`);
@@ -121,38 +123,38 @@ export class TreeNotificationsService {
 
     return interaction.showModal(
       new ModalBuilder()
-        .setTitle("Tree Notifications Settings")
+        .setTitle("Paramètres des notifications de l'arbre")
         .setCustomId("tree-notifications-settings")
         .addTextDisplayComponents([
           new TextDisplayBuilder({
-            content: "These settings will only take effect if the next watering time is greater than 30 seconds from the submission time.",
+            content: "Ces paramètres ne prendront effet que si le timing du prochain arrosage est supérieur à 30 secondes à partir de l'heure de soumission du formulaire.",
           }),
         ])
         .addLabelComponents([
           new LabelBuilder({
-            label: "Enable Notifications",
-            description: "Enable or disable tree watering notifications",
+            label: "Activer les notifications",
+            description: "Recevoir ou non les notifications pour arroser l'arbre",
           }).setStringSelectMenuComponent(new StringSelectMenuBuilder({
             customId: "enabled",
             required: true,
             options: [
               {
-                label: "Enabled",
-                description: "Receive notifications when the tree is ready for watering",
+                label: "Activé",
+                description: "Recevoir les notifications quand l'arbre est prêt à être arrosé",
                 value: "true",
                 default: user?.treeNotifications_Preferences.enabled ?? false,
               },
               {
-                label: "Disabled",
-                description: "Do not receive notifications",
+                label: "Désactivé",
+                description: "Ne pas recevoir de notifications",
                 value: "false",
                 default: !(user?.treeNotifications_Preferences.enabled ?? false),
               },
             ],
           })),
           new LabelBuilder({
-            label: "Start Time (HH:MM, 24h format)",
-            description: "Time to start receiving notifications",
+            label: "Heure de début (HH:MM, 24h)",
+            description: "Heure à partir de laquelle vous souhaitez recevoir des notifications",
           }).setTextInputComponent(new TextInputBuilder({
             customId: "start-time",
             style: 1,
@@ -162,8 +164,8 @@ export class TreeNotificationsService {
             value: user?.treeNotifications_Preferences.startTime ?? undefined,
           })),
           new LabelBuilder({
-            label: "End Time (HH:MM, 24h format)",
-            description: "Time to stop receiving notifications",
+            label: "Heure de fin (HH:MM, 24h)",
+            description: "Heure après laquelle vous ne souhaitez plus recevoir de notifications",
           }).setTextInputComponent(new TextInputBuilder({
             customId: "end-time",
             style: 1,
@@ -187,49 +189,51 @@ export class TreeNotificationsService {
 
     // Validate time format HH:MM
     if (!/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime) || parseTimeInMinutes(startTime) === null || parseTimeInMinutes(endTime) === null) {
-      await interaction.reply({
-        content: "Invalid time format! Please use HH:MM format.",
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
+      await throwError("Format d'heure invalide ! Veuillez rentrer une heure en format HH:MM (par ex. 13:45).", interaction);
       return;
     }
 
-    await this.db.user.upsert({
-      where: {
-        discordId: interaction.user.id,
-      },
-      create: {
-        discordId: interaction.user.id,
-        treeNotifications_Preferences: {
-          create: {
-            enabled,
-            startTime,
-            endTime,
-          },
+    try {
+      await this.db.user.upsert({
+        where: {
+          discordId: interaction.user.id,
         },
-      },
-      update: {
-        treeNotifications_Preferences: {
-          upsert: {
+        create: {
+          discordId: interaction.user.id,
+          treeNotifications_Preferences: {
             create: {
               enabled,
               startTime,
               endTime,
             },
-            update: {
-              enabled,
-              startTime,
-              endTime,
+          },
+        },
+        update: {
+          treeNotifications_Preferences: {
+            upsert: {
+              create: {
+                enabled,
+                startTime,
+                endTime,
+              },
+              update: {
+                enabled,
+                startTime,
+                endTime,
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    await interaction.reply({
-      content: "Your tree notification preferences have been updated.",
-      flags: MessageFlagsBitField.Flags.Ephemeral,
-    });
+      await interaction.reply({
+        content: "Vos préférences de notification ont bien été sauvegardées.",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+    } catch (e) {
+      this.logger.error(`Failed to save tree notification preferences for user ${interaction.user.id}: ${e}`);
+      await throwError("Une erreur est survenue lors de la sauvegarde de vos préférences.", interaction);
+    }
   }
 
   /**
@@ -320,7 +324,7 @@ export class TreeNotificationsService {
     // Implementation for handling tree watering
     const channel = client.channels.cache.get(this.CHANNEL_ID) as TextChannel;
     try {
-      await channel.send(`The tree is ready for watering! <@&${this.ROLE_ID}>`);
+      await channel.send(`L'arbre est prêt à être arrosé ! <@&${this.ROLE_ID}>`);
       this.logger.debug("Sent watering notification.");
       this.nextWateringDate = null;
     } catch (e) {

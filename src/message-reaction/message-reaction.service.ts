@@ -15,6 +15,14 @@ import { RemoveReactionCommandDto } from "./dto/remove-reaction.command.dto";
 import { PlaceholdersLib } from "./libs/placeholders.lib";
 import { DiscordLoggerService } from "../logger/discord-logger.service";
 
+// TODO: Refactor, use interactions everywhere
+// TODO: Fix case sensitivity issues
+// TODO: Add pagination to list-stimuli command
+// TODO: Add server-specific stimuli
+// TODO: Fix bug where 2 stimuli with same prefix cause only first to trigger
+/**
+ * Service that reacts to messages based on predefined stimuli.
+ */
 @Injectable()
 export class MessageReactionService {
   private stimuli: Array<MessageReaction_StimulusWithReactions>;
