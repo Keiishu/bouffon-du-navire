@@ -1,6 +1,9 @@
 services:
   bot:
-    build: .
+    build:
+      context: .
+      secrets:
+        - db-url
     depends_on:
       db:
         condition: service_healthy
@@ -27,3 +30,6 @@ services:
       - "5432:5432"
 volumes:
   bfn_db:
+secrets:
+  db-url:
+    environment: DATABASE_URL
