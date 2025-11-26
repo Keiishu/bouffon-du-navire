@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { Context, ContextOf, Modal, ModalContext, On, Once, SlashCommand, SlashCommandContext } from "necord";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import {
@@ -14,6 +14,7 @@ import {
 } from "discord.js";
 import { PrismaService } from "../prisma/prisma.service";
 import { parseTimeInMinutes } from "../utils/datetime";
+import { DiscordLoggerService } from "../logger/discord-logger.service";
 
 /**
  * Service to handle tree watering notifications.
@@ -21,8 +22,6 @@ import { parseTimeInMinutes } from "../utils/datetime";
  */
 @Injectable()
 export class TreeNotificationsService {
-  private readonly logger = new Logger(TreeNotificationsService.name);
-
   private readonly MESSAGE_ID: Snowflake = "1442870371106820186";
   private readonly CHANNEL_ID: Snowflake = "1442870041426133154";
   private readonly ROLE_ID: Snowflake = "1442870502522753075";
@@ -30,7 +29,9 @@ export class TreeNotificationsService {
   private lastWateringUserId: string | null = null;
   private nextWateringDate: Date | null = null;
 
-  constructor(private readonly scheduler: SchedulerRegistry, private readonly db: PrismaService) {
+  constructor(private readonly logger: DiscordLoggerService, private readonly scheduler: SchedulerRegistry,
+              private readonly db: PrismaService) {
+    this.logger.setContext(TreeNotificationsService.name);
   }
 
   /**

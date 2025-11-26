@@ -1,4 +1,4 @@
-import { Injectable, Logger, UseInterceptors } from "@nestjs/common";
+import { Injectable, UseInterceptors } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Context, ContextOf, On, Once, Options, SlashCommand, SlashCommandContext } from "necord";
 import { Prisma } from "../prisma/generated/prisma-client/client";
@@ -13,13 +13,14 @@ import { UpdateStimulusCommandDto } from "./dto/update-stimulus.command.dto";
 import { arrayChoose } from "../utils/array.utils";
 import { RemoveReactionCommandDto } from "./dto/remove-reaction.command.dto";
 import { PlaceholdersLib } from "./libs/placeholders.lib";
+import { DiscordLoggerService } from "../logger/discord-logger.service";
 
 @Injectable()
 export class MessageReactionService {
-  private readonly logger = new Logger(MessageReactionService.name);
   private stimuli: Array<MessageReaction_StimulusWithReactions>;
 
-  constructor(private readonly db: PrismaService) {
+  constructor(private readonly logger: DiscordLoggerService, private readonly db: PrismaService) {
+    this.logger.setContext(MessageReactionService.name);
   }
 
   @Once("clientReady")

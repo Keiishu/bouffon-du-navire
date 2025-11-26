@@ -11,6 +11,7 @@ import { VendingMachineInterceptor } from "./interceptors/vending-machine.interc
 import { AddProductCommandDto } from "./dto/add-product-command.dto";
 import { BuyProductCommandDto } from "./dto/buy-product-command.dto";
 import { RemoveProductCommandDto } from "./dto/remove-product-command.dto";
+import { DiscordLoggerService } from "../logger/discord-logger.service";
 
 export const VendingMachineCommandDecorator = createCommandGroupDecorator({
   name: "vending-machine",
@@ -27,10 +28,10 @@ export const VendingMachineAdminCommandDecorator = createCommandGroupDecorator({
 @Injectable()
 @VendingMachineCommandDecorator()
 export class VendingMachineService {
-  private readonly logger = new Logger(VendingMachineService.name);
-
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, private readonly db: PrismaService,
-              private readonly schedulerRegistry: SchedulerRegistry, @Inject("Pexels") private readonly pexels: ReturnType<typeof createClient>) {
+  constructor(private readonly logger: DiscordLoggerService, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+              private readonly db: PrismaService, private readonly schedulerRegistry: SchedulerRegistry,
+              @Inject("Pexels") private readonly pexels: ReturnType<typeof createClient>) {
+    this.logger.setContext(VendingMachineService.name);
   }
 
   @On("clientReady")

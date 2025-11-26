@@ -10,9 +10,11 @@ import { VendingMachineModule } from './vending-machine/vending-machine.module';
 import { ScheduleModule } from "@nestjs/schedule";
 import { FunCommandsModule } from './fun-commands/fun-commands.module';
 import { TreeNotificationsModule } from './tree-notifications/tree-notifications.module';
+import { DiscordLoggerModule } from "./logger/discord-logger.module";
 
 @Module({
   imports: [
+    DiscordLoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: joi.object({
