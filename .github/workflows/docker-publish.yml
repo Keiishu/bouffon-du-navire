@@ -1,10 +1,5 @@
 name: Docker publish
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 on:
   push:
     branches: [ "main" ]
@@ -14,42 +9,13 @@ on:
     branches: [ "main" ]
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-#    services:
-#      postgres:
-#        image: postgres:15
-#        env:
-#          POSTGRES_USER: postgres
-#          POSTGRES_PASSWORD: postgres
-#        options: >-
-#          --health-cmd="pg_isready -U postgres"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=5
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v6
-        with:
-          push: false
-          tags: bfn-test:latest
-          context: .
-          secrets: "db-url=postgres://postgres:postgres@postgres:5432/postgres"
-
-
   build:
-    needs: test
-    
     runs-on: ubuntu-latest
     permissions:
       contents: read
