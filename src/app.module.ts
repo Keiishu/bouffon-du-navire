@@ -9,6 +9,7 @@ import { MessageReactionModule } from "./message-reaction/message-reaction.modul
 import { VendingMachineModule } from './vending-machine/vending-machine.module';
 import { ScheduleModule } from "@nestjs/schedule";
 import { FunCommandsModule } from './fun-commands/fun-commands.module';
+import { TreeNotificationsModule } from './tree-notifications/tree-notifications.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { FunCommandsModule } from './fun-commands/fun-commands.module';
     }),
     MessageReactionModule,
     VendingMachineModule,
-    FunCommandsModule],
+    FunCommandsModule,
+    TreeNotificationsModule],
   providers: [AppService],
 })
 export class AppModule {

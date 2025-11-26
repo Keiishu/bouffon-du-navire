@@ -29,13 +29,13 @@ export const VendingMachineAdminCommandDecorator = createCommandGroupDecorator({
 export class VendingMachineService {
   private readonly logger = new Logger(VendingMachineService.name);
 
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, private readonly prisma: PrismaService,
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, private readonly db: PrismaService,
               private readonly schedulerRegistry: SchedulerRegistry, @Inject("Pexels") private readonly pexels: ReturnType<typeof createClient>) {
   }
 
   @On("clientReady")
   public async onReady() {
-    await this.cacheManager.set("vending-machine:products", await this.prisma.vendingMachine_Product.findMany());
+    await this.cacheManager.set("vending-machine:products", await this.db.vendingMachine_Product.findMany());
   }
 
   @UseInterceptors(VendingMachineInterceptor)
@@ -58,7 +58,7 @@ export class VendingMachineService {
       }
 
       // Log the purchase
-      await this.prisma.vendingMachine_Buy.create({
+      await this.db.vendingMachine_Buy.create({
         data: {
           product: {
             connect: {
@@ -145,7 +145,7 @@ export class VendingMachineService {
 export class VendingMachineAdminService {
   private readonly logger = new Logger(VendingMachineAdminService.name);
 
-  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, private readonly prisma: PrismaService) {
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache, private readonly db: PrismaService) {
   }
 
   @Subcommand({
@@ -154,7 +154,7 @@ export class VendingMachineAdminService {
   })
   public async addProduct(@Context() [interaction]: SlashCommandContext, @Options() options: AddProductCommandDto) {
     try {
-      const newProduct = await this.prisma.vendingMachine_Product.create({
+      const newProduct = await this.db.vendingMachine_Product.create({
         data: {
           name: options.name,
         },
@@ -185,7 +185,7 @@ export class VendingMachineAdminService {
         return throwError("Product not found!", interaction);
       }
 
-      await this.prisma.vendingMachine_Product.delete({where: {id: product.id}});
+      await this.db.vendingMachine_Product.delete({where: {id: product.id}});
 
       const products = await this.cacheManager.get("vending-machine:products") as VendingMachine_Product[];
       await this.cacheManager.set("vending-machine:products", products.filter((p) => p.name !== options.name));
