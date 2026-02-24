@@ -282,6 +282,9 @@ export class TreeNotificationsService {
       if (this.lastWateringUserId !== lastWateringUserId) {
         this.lastWateringUserId = lastWateringUserId;
         this.logger.debug(`New watering user detected: ${lastWateringUserId}`);
+      } else {
+        this.logger.debug("Watering user has not changed since last update");
+        return null;
       }
     } else {
       this.logger.error("Last watering user ID not found in message");
