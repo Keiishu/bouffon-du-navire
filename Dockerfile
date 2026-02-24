@@ -17,7 +17,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN --mount=type=secret,id=db-url,env=DATABASE_URL pnpm run db:generate
+RUN --mount=type=secret,id=DATABASE_URL,env=DATABASE_URL pnpm run db:generate
 
 FROM prisma AS build
 

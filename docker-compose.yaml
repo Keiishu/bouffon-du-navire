@@ -3,7 +3,7 @@ services:
     build:
       context: .
       secrets:
-        - db-url
+        - DATABASE_URL
     depends_on:
       db:
         condition: service_healthy
@@ -31,5 +31,5 @@ services:
 volumes:
   bfn_db:
 secrets:
-  db-url:
+  DATABASE_URL:
     environment: DATABASE_URL
