@@ -291,7 +291,7 @@ export class TreeNotificationsService {
       return null;
     }
 
-    const nextWateringMatchArray = description?.match(/<t:(\d+):R>/);
+    const nextWateringMatchArray = description?.match(/<t:(\d+):[RT]>/);
     if (nextWateringMatchArray && nextWateringMatchArray[1]) {
       const nextWateringTimestamp = parseInt(nextWateringMatchArray[1]) * 1000;
       if (isNaN(nextWateringTimestamp)) {
